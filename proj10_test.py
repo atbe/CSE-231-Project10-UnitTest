@@ -91,14 +91,13 @@ class TestProj10(unittest.TestCase):
         """
         valid_fnd_move(src_card : cards.Card, dest_Card : cards.Card)
         Returns:
-            True - if move is valie bsed on requirenments below.
+            True - if move is valid based on requirements below.
 
-        Moving one card from foundation A(src_card) to foundation B(dest_card) requires that:
+        Moving one card to a foundation must satisfy these conditions.
             - src_card and dest_card be face_up
             - src_card and dest_card have the SAME suit.
             - src_card.rank() is 1 greater than dest_card.rank()
                 ~ src_card == 11, dest_card == 10, good.
-            - if src_card is None, de
         """
         # test face down
         self.assertFalse(proj10.valid_fnd_move(self._face_down_card, self._heart_two_card),
@@ -108,14 +107,45 @@ class TestProj10(unittest.TestCase):
 
         # test diff suits
         self.assertFalse(proj10.valid_fnd_move(self._heart_two_card, self._club_two_card),
-                msg="src_card msut have same suit as dest_card.")
-        # test low src_card suits
+                msg="src_card must have same suit as dest_card.")
+        # test low src_card rank
         self.assertFalse(proj10.valid_fnd_move(self._heart_two_card, self._club_two_card),
                 msg="src_card must have rank 2 higher than dest_card.")
 
         # test good input
         self.assertTrue(proj10.valid_fnd_move(self._heart_three_card, self._heart_two_card),
-                msg="src_card with rank 1 higher than the dest_card and with same suit as dest_card is valid.")
+                msg="src_card with rank 1 higher than the dest_card and with same suit as dest_card is valid input.")
+
+
+    def testValidTableauMoveFunction(self):
+        """
+        valid_tab_move(src_card : cards.Card, dest_Card : cards.Card)
+        Returns:
+            True - if move is valid based on requirements below.
+
+        Moving one card to a tabluea must satisfy these conditions
+            - src_card and dest_card be face_up
+            - src_card and dest_card have the DIFF suit.
+            - src_card.rank() is 1 less than dest_card.rank()
+                ~ src_card == 10, dest_card == 11, good.
+        """
+        # test face down
+        self.assertFalse(proj10.valid_tab_move(self._face_down_card, self._heart_two_card),
+                msg="A face down src_card is not a valid move.")
+        self.assertFalse(proj10.valid_tab_move(self._heart_two_card, self._face_down_card),
+                msg="A face down dest_card is not a valid move.")
+
+        # test same suits
+        self.assertFalse(proj10.valid_fnd_move(self._heart_two_card, self._heart_two_card),
+                msg="src_card must have different suit than dest_card.")
+        # test low dest_card rank
+        self.assertFalse(proj10.valid_fnd_move(self._heart_three_card, self._club_two_card),
+                msg="src_card must have rank 2 higher than dest_card.")
+
+        # test good input
+        self.assertTrue(proj10.valid_fnd_move(self._heart_three_card, self._heart_two_card),
+                msg="dest_card with rank 1 higher than the src_card and with diff suit than dest_card is valid input.")
+
 
 
 
