@@ -800,4 +800,6 @@ rank be no more than 1 less than the dest_card."):
                 msg="Card at the bottom of the src_tab should be flipped when the move succeeds.")
 
 if __name__ == '__main__':
-    unittest.main()
+    with open('unittest_output.txt', 'w') as out_file:
+        runner = unittest.TextTestRunner(out_file)
+        unittest.main(testRunner=runner)
