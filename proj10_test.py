@@ -520,7 +520,6 @@ than the rank of what is on the top of the fnd is an error."):
         self.assertTrue(test_tab_col_dest[-1] == test_src_card,
                 msg="tab_to_fnd should succed if tab[-1] is 1 rank higher than dest and suits are diff")
 
-
 # waste_to_tableau face test
 
     def testWasteToTableauFaceDown(self):
@@ -568,6 +567,8 @@ than the rank of what is on the top of the fnd is an error."):
         self.assertTrue(test_tab_col_dest[-1] == test_src_card,
                 msg="tab_to_fnd should succed if source card is face up and valid.")
 
+# stock_to_waste tests
+
     def teststockToWasteEmptyStockBad(self):
         """
         stock_to_waste(stock : Deck, waste : list<Card>)
@@ -598,7 +599,199 @@ than the rank of what is on the top of the fnd is an error."):
                 msg="Non-Empty stock should move a card to the top of the tableau.")
 
 
+# tableau_to_tableau empty tabluea
 
+    def testTableauToTableauEmptySrcBad(self):
+        """
+        tableau_to_tableau(tab1: list<Card>, tab2: list<Card>, n : int)
+        Returns:
+            None
+
+        Empty src tableau.
+        """
+        with self.assertRaises(RuntimeError, msg="RuntimeError should be thrown when src_tab is empty."):
+            test_empty_src_tab = []
+            test_dest_tab = self.grab_test_tab_col(1)
+            n = 1
+            proj10.tableau_to_tableau(test_empty_src_tab, test_dest_tab, n)
+
+    def testTableauToTableauEmptyDestGood(self):
+        """
+        tableau_to_tableau(tab1: list<Card>, tab2: list<Card>, n : int)
+        Returns:
+            None
+
+        Non-empty src tableau and empty dest tableau.
+        """
+        test_src_card = cards.Card(rank=2, suit=2)
+        test_empty_src_tab = [test_src_card]
+        test_dest_tab = []
+        n = 1
+        proj10.tableau_to_tableau(test_empty_src_tab, test_dest_tab, n)
+
+        self.assertTrue(test_dest_tab[-1] == test_src_card,
+                msg="Non-Empty src_tab should move a card to empty dest_tab.")
+
+
+# tableau_to_tableau rank test
+
+    def testTableauToTableauSuitBad(self):
+        """
+        tableau_to_tableau(tab1: list<Card>, tab2: list<Card>, n : int)
+        Returns:
+            None
+
+        Bad suit, good rank.
+        """
+        with self.assertRaises(RuntimeError, msg="Pushing a card to tab requires the cards \
+have diff suits."):
+            # test source tableau
+            test_tab_col_src = [cards.Card(rank=2, suit=1)]
+            # test destination foundation with an ace on top
+            test_tab_col_dest = [cards.Card(rank=3, suit=1)]
+            n = 1
+            proj10.tableau_to_tableau(test_tab_col_src, test_tab_col_dest, n)
+
+    def testTableauToTableauRankBad(self):
+        """
+        tableau_to_tableau(tab1: list<Card>, tab2: list<Card>, n : int)
+        Returns:
+            None
+
+        Good suit, bad rank.
+        """
+        with self.assertRaises(RuntimeError, msg="Pushing a card to tab requires the src_card \
+rank be no more than 1 less than the dest_card."):
+            # test source tableau
+            test_tab_col_src = [cards.Card(rank=2, suit=2)]
+            # test destination foundation with an ace on top
+            test_tab_col_dest = [cards.Card(rank=1, suit=1)]
+            n = 1
+            proj10.tableau_to_tableau(test_tab_col_src, test_tab_col_dest, n)
+
+# tableau_to_foundation suit test
+
+    def testTableauToTableauSuitGoodRankMultipleCardsGood(self):
+        """
+        tableau_to_tableau(tab1: list<Card>, tab2: list<Card>, n : int)
+        Returns:
+            None
+
+        Good suit, good rank.
+        """
+        # test source tableau
+        test_src_card = cards.Card(rank=2, suit=2)
+        test_tab_col_src = [test_src_card, test_src_card]
+        test_tab_col_src_copy = [test_src_card, test_src_card]
+        # test destination foundation with an ace on top
+        test_tab_col_dest = [cards.Card(rank=3, suit=1)]
+        n = 2
+        proj10.tableau_to_tableau(test_tab_col_src, test_tab_col_dest, n)
+        self.assertListEqual(test_tab_col_dest[-n:], test_tab_col_src_copy,
+                msg="tab_to_tab should succeed and move N items if tab[-1] is same suit as dest.")
+
+
+    def testTableauToTableauSuitGoodRankMultipleCardsBadTopCard(self):
+        """
+        tableau_to_tableau(tab1: list<Card>, tab2: list<Card>, n : int)
+        Returns:
+            None
+
+        Good suit, good rank.
+        """
+        with self.assertRaises(RuntimeError, msg="Card at top of the n stack should be checked and raise RuntimeError if it is not a valid card."):
+            # test source tableau
+            test_src_card = cards.Card(rank=2, suit=2)
+            test_tab_col_src = [cards.Card(rank=8, suit=2), test_src_card]
+            test_tab_col_src_copy = [test_src_card, test_src_card]
+            # test destination foundation with an ace on top
+            test_tab_col_dest = [cards.Card(rank=3, suit=1)]
+            n = 2
+            proj10.tableau_to_tableau(test_tab_col_src, test_tab_col_dest, n)
+
+
+    def testTableauToTableauSuitGoodRankGoodOneCard(self):
+        """
+        tableau_to_tableau(tab1: list<Card>, tab2: list<Card>, n : int)
+        Returns:
+            None
+
+        Good suit, good rank.
+        """
+        # test source tableau
+        test_src_card = cards.Card(rank=2, suit=2)
+        test_tab_col_src = [test_src_card]
+        # test destination foundation with an ace on top
+        test_tab_col_dest = [cards.Card(rank=3, suit=1)]
+        n = 1
+        proj10.tableau_to_tableau(test_tab_col_src, test_tab_col_dest, n)
+        self.assertTrue(test_tab_col_dest[-1] == test_src_card,
+                msg="tab_to_tab should succed if tab[-1] is same suit as dest.")
+
+# tableau_to_tableau face test
+
+    def testTableauToTableauFaceDown(self):
+        """
+        tableau_to_tableau(tab1: list<Card>, tab2: list<Card>, n : int)
+        Returns:
+            None
+
+        Good suit, good rank.
+        """
+        with self.assertRaises(RuntimeError, msg="Face down source card should cause an error."):
+            # test source waste
+            test_tab_src = [cards.Card(rank=1, suit=2)]
+            if test_tab_src[-1].is_face_up():
+                test_tab_src[-1].flip_card()
+            n = 1
+            # test destination foundation with an ace on top
+            test_tab_col_dest = [cards.Card(rank=2, suit=1)]
+            try:
+                proj10.tableau_to_tableau(test_tab_src, test_tab_col_dest)
+            except TypeError as e:
+                proj10.tableau_to_tableau(test_tab_src, test_tab_col_dest, n)
+
+    def testWasteToTableauFaceUp(self):
+        """
+        tableau_to_tableau(tab1: list<Card>, tab2: list<Card>, n : int)
+        Returns:
+            None
+
+        Good suit, good rank.
+        """
+        # test source tableau
+        test_src_card = cards.Card(rank=1, suit=1)
+        if not test_src_card.is_face_up():
+            test_src_card.flip_card()
+        test_tab_src = [test_src_card]
+        n = 1
+        # test destination foundation with an ace on top
+        test_tab_col_dest = [cards.Card(rank=2, suit=2)]
+        #
+        try:
+            proj10.tableau_to_tableau(test_tab_src, test_tab_col_dest)
+        except TypeError as e:
+            proj10.tableau_to_tableau(test_tab_src, test_tab_col_dest, n)
+
+        self.assertTrue(test_tab_col_dest[-1] == test_src_card,
+                msg="tab_to_tab should succeed if source card is face up and valid.")
+
+    def testTableauToTableauFlipLastTabCard(self):
+        """
+        tableau_to_tableau(tab1: list<Card>, tab2: list<Card>, n : int)
+        Returns:
+            None
+
+        Card at the bottom of the source tab_col should be flipped up.
+        """
+        test_src_card = cards.Card(rank=2, suit=2)
+        test_tab_col_src = [self._face_down_card, test_src_card, test_src_card]
+        # test destination foundation with an ace on top
+        test_tab_col_dest = [cards.Card(rank=3, suit=1)]
+        n = 2
+        proj10.tableau_to_tableau(test_tab_col_src, test_tab_col_dest, n)
+        self.assertTrue(test_tab_col_src[-1].is_face_up(),
+                msg="Card at the bottom of the src_tab should be flipped when the move succeeds.")
 
 if __name__ == '__main__':
     unittest.main()
