@@ -40,7 +40,7 @@ class TestProj10(unittest.TestCase):
         Choose a length 1 - 7 inclusive
         """
         if not (1 <= length and length <= 7):
-            raise ValueError("1 - 7 tab length required.")
+            raise ValueError("1 - 7 tab length required for grab_test_tab_col.")
 
         return self._tab[length - 1][:]
 
@@ -48,6 +48,9 @@ class TestProj10(unittest.TestCase):
         """
         Initialize a game.
         """
+        # re-route cards to cards1
+        cards = cards1
+
         # grab a few cards
         self._heart_two_card = cards.Card(rank=2, suit=3)
         self._heart_three_card = cards.Card(rank=3, suit=3)
@@ -113,7 +116,7 @@ Are you sure your project is using cards1.py?')
 
         # stock
         self.assertListEqual(stock, self._stock,
-                msg='Stock was not setup in the correct manner.\nSize = {}. Check the project PDF.\
+                msg='Stock was not setup in the correct manner.\nSize = {}.\nCheck the project PDF.\
 Are you sure your project is using cards1.py?'.format(len(stock)))
 
     def testSetupGameFunctionWaste(self):
@@ -129,7 +132,7 @@ Are you sure your project is using cards1.py?'.format(len(stock)))
 
         # waste
         self.assertListEqual(waste, self._waste,
-                msg='Waste was not setup in the correct manner.\nSize = {} It should have one card Check t eh project PDF.\
+                msg='Waste was not setup in the correct manner.\nSize = {}\nIt should have one card Check t eh project PDF.\
 Are you sure your project is using cards1.py?'.format(len(waste)))
 
     # not used for project scoring
@@ -184,10 +187,10 @@ Are you sure your project is using cards1.py?'.format(len(waste)))
                 msg="A face down dest_card is not a valid move.")
 
         # test diff suits
-        self.assertFalse(proj10.valid_fnd_move(self._heart_two_card, self._club_two_card),
+        self.assertFalse(proj10.valid_fnd_move(self._heart_three_card, self._club_two_card),
                 msg="src_card must have same suit as dest_card.")
         # test low src_card rank
-        self.assertFalse(proj10.valid_fnd_move(self._heart_two_card, self._club_two_card),
+        self.assertFalse(proj10.valid_fnd_move(self._heart_two_card, self._heart_two_card),
                 msg="src_card must have rank 2 higher than dest_card.")
 
         # test good input
@@ -214,14 +217,14 @@ Are you sure your project is using cards1.py?'.format(len(waste)))
                 msg="A face down dest_card is not a valid move.")
 
         # test same suits
-        self.assertFalse(proj10.valid_fnd_move(self._heart_two_card, self._heart_two_card),
+        self.assertFalse(proj10.valid_tab_move(self._heart_two_card, self._heart_three_card),
                 msg="src_card must have different suit than dest_card.")
         # test low dest_card rank
-        self.assertFalse(proj10.valid_fnd_move(self._heart_three_card, self._club_two_card),
+        self.assertFalse(proj10.valid_tab_move(self._heart_three_card, self._club_two_card),
                 msg="src_card must have rank 2 higher than dest_card.")
 
         # test good input
-        self.assertTrue(proj10.valid_fnd_move(self._heart_three_card, self._heart_two_card),
+        self.assertTrue(proj10.valid_tab_move(self._heart_two_card, self._club_three_card),
                 msg="dest_card with rank 1 higher than the src_card and with diff suit than dest_card is valid input.")
 
 # tableau_to_foundation empty test
@@ -274,7 +277,7 @@ Are you sure your project is using cards1.py?'.format(len(waste)))
         Good suit, bad rank.
         """
         with self.assertRaises(RuntimeError, msg="Pushing a card to fnd requires it to the cards \
-rank to be 1 higher than what is on the top of the fnd."):
+rank to be no more than 1 greater than the dest_card."):
             # test source tableau
             test_tab_col_src = [cards.Card(rank=3, suit=1)]
             # test destination foundation with an ace on top
@@ -336,8 +339,7 @@ rank to be 1 higher than what is on the top of the fnd."):
         test_fnd_col_dest = [cards.Card(rank=1, suit=1)]
         proj10.tableau_to_foundation(test_tab_col_src, test_fnd_col_dest)
         self.assertTrue(test_fnd_col_dest[-1] == test_src_card,
-                msg="tab_to_fnd should succed if tab[-1] is face up.")
-
+                msg="tab_to_fnd should succeed if tab[-1] is face up.")
 
     def testTableauToFoundationFaceBad(self):
         """
@@ -347,7 +349,7 @@ rank to be 1 higher than what is on the top of the fnd."):
 
         Bad suit, good rank.
         """
-        with self.assertRaises(RuntimeError, msg="Pushing a card to fnd requires it to the cards have same suit."):
+        with self.assertRaises(RuntimeError, msg="Pushing a card to fnd requires it to the src_card be face up."):
             test_src_card = cards.Card(rank=2, suit=1)
             if test_src_card.is_face_up():
                 test_src_card.flip_card()
@@ -356,7 +358,6 @@ rank to be 1 higher than what is on the top of the fnd."):
             # test destination foundation with an ace on top
             test_fnd_col_dest = [cards.Card(rank=1, suit=1)]
             proj10.tableau_to_foundation(test_tab_col_src, test_fnd_col_dest)
-
 
 # tableau_to_foundation last card in tableau face up
 
@@ -375,7 +376,7 @@ rank to be 1 higher than what is on the top of the fnd."):
         test_fnd = [cards.Card(rank=1, suit=1)]
         proj10.tableau_to_foundation(test_tab_col, test_fnd)
         self.assertTrue(test_tab_col[-1].is_face_up(),
-                msg="Card at the bottom of a tableau cannot be face down after tab_to_fnd move.")
+                msg="Card at the bottom of a tableau cannot be face down after valid tab_to_fnd move.")
 
 # waste_to_foundation rank test
 
@@ -417,7 +418,6 @@ rank to be 1 higher than what is on the top of the fnd."):
             try:
                 proj10.waste_to_foundation(test_waste_src, test_fnd_col_dest)
             except TypeError as e:
-                # print("Dr. Enbody may have caused some students to add/not add the source parameter to this method. We try both.", str(e))
                 proj10.waste_to_foundation(test_waste_src, test_fnd_col_dest, [])
 
     def testWasteToFoundationRankGoodSuitGood(self):
@@ -437,7 +437,6 @@ rank to be 1 higher than what is on the top of the fnd."):
         try:
             proj10.waste_to_foundation(test_src_waste, test_fnd_col_dest)
         except TypeError as e:
-            # print("Dr. Enbody may have caused some students to add/not add the source parameter to this method. We try both.", str(e))
             proj10.waste_to_foundation(test_src_waste, test_fnd_col_dest, [])
 
         self.assertTrue(test_fnd_col_dest[-1] == test_src_card,
@@ -460,6 +459,114 @@ rank to be 1 higher than what is on the top of the fnd."):
             test_fnd_col_dest = [cards.Card(rank=1, suit=1)]
             proj10.tableau_to_foundation(test_waste, test_fnd_col_dest)
 
+# waste_to_tableau rank/suit tests
+
+    def testWasteToTableauRankBad(self):
+        """
+        waste_to_tableau(waste : list, tab_col : list, stock : Deck)
+        Returns:
+            None
+
+        Good suit, bad rank.
+        """
+        with self.assertRaises(RuntimeError, msg="Pushing a card to fnd that is not one rank lower\
+than the rank of what is on the top of the fnd is an error."):
+            # test source waste
+            test_waste_src = [cards.Card(rank=1, suit=2)]
+            # test destination foundation with an ace on top
+            test_tab_col_dest = [cards.Card(rank=3, suit=1)]
+            try:
+                proj10.waste_to_tableau(test_waste_src, test_tab_col_dest)
+            except TypeError as e:
+                proj10.waste_to_tableau(test_waste_src, test_tab_col_dest, [])
+
+    def testWasteToTableauSuitBad(self):
+        """
+        waste_to_tableau(waste : list, tab_col : list, stock : Deck)
+        Returns:
+            None
+
+        Bad suit, bad rank.
+        """
+        with self.assertRaises(RuntimeError, msg="Pushing a card to tab with same suit as tab[-1] is an error."):
+            # test source waste
+            test_waste_src = [cards.Card(rank=1, suit=1)]
+            # test destination foundation with an ace on top
+            test_tab_col_dest = [cards.Card(rank=2, suit=1)]
+            try:
+                proj10.waste_to_tableau(test_waste_src, test_tab_col_dest)
+            except TypeError as e:
+                proj10.waste_to_tableau(test_waste_src, test_tab_col_dest, [])
+
+    def testWasteToTableauRankGoodSuiteGood(self):
+        """
+        waste_to_tableau(waste : list, tab_col : list, stock : Deck)
+        Returns:
+            None
+
+        Good suit, good rank.
+        """
+        # test source tableau
+        test_src_card = cards.Card(rank=1, suit=1)
+        test_src_waste = [test_src_card]
+        # test destination foundation with an ace on top
+        test_tab_col_dest = [cards.Card(rank=2, suit=2)]
+        #
+        try:
+            proj10.waste_to_tableau(test_src_waste, test_tab_col_dest)
+        except TypeError as e:
+            proj10.waste_to_tableau(test_src_waste, test_tab_col_dest, [])
+
+        self.assertTrue(test_tab_col_dest[-1] == test_src_card,
+                msg="tab_to_fnd should succed if tab[-1] is 1 rank higher than dest and suits are diff")
+
+
+# waste_to_tableau face test
+
+    def testWasteToTableauFaceDown(self):
+        """
+        waste_to_tableau(waste : list, tab_col : list, stock : Deck)
+        Returns:
+            None
+
+        Good suit, good rank.
+        """
+        with self.assertRaises(RuntimeError, msg="Face down source card should cause an error."):
+            # test source waste
+            test_waste_src = [cards.Card(rank=1, suit=2)]
+            if test_waste_src[-1].is_face_up():
+                test_waste_src[-1].flip_card()
+
+            # test destination foundation with an ace on top
+            test_tab_col_dest = [cards.Card(rank=2, suit=1)]
+            try:
+                proj10.waste_to_tableau(test_waste_src, test_tab_col_dest)
+            except TypeError as e:
+                proj10.waste_to_tableau(test_waste_src, test_tab_col_dest, [])
+
+    def testWasteToTableauFaceUp(self):
+        """
+        waste_to_tableau(waste : list, tab_col : list, stock : Deck)
+        Returns:
+            None
+
+        Good suit, good rank.
+        """
+        # test source tableau
+        test_src_card = cards.Card(rank=1, suit=1)
+        if not test_src_card.is_face_up():
+            test_src_card.flip_card()
+        test_src_waste = [test_src_card]
+        # test destination foundation with an ace on top
+        test_tab_col_dest = [cards.Card(rank=2, suit=2)]
+        #
+        try:
+            proj10.waste_to_tableau(test_src_waste, test_tab_col_dest)
+        except TypeError as e:
+            proj10.waste_to_tableau(test_src_waste, test_tab_col_dest, [])
+
+        self.assertTrue(test_tab_col_dest[-1] == test_src_card,
+                msg="tab_to_fnd should succed if source card is face up and valid.")
 
 
 
