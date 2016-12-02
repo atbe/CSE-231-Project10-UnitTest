@@ -568,6 +568,35 @@ than the rank of what is on the top of the fnd is an error."):
         self.assertTrue(test_tab_col_dest[-1] == test_src_card,
                 msg="tab_to_fnd should succed if source card is face up and valid.")
 
+    def teststockToWasteEmptyStockBad(self):
+        """
+        stock_to_waste(stock : Deck, waste : list<Card>)
+        Returns:
+            None
+
+        Empty stock.
+        """
+        with self.assertRaises(RuntimeError, msg="RuntimeError should be thrown when moving from stock to waste and stock is empty."):
+            empty_stock = cards.Deck()
+            empty_stock._Deck__deck = []
+            waste = []
+            proj10.stock_to_waste(empty_stock, waste)
+
+    def teststockToWasteEmptyStockGood(self):
+        """
+        stock_to_waste(stock : Deck, waste : list<Card>)
+        Returns:
+            None
+
+        Non-empty stock.
+        """
+        non_empty_stock = cards.Deck()
+        sample_card = non_empty_stock._Deck__deck[-1]
+        waste = []
+        proj10.stock_to_waste(non_empty_stock, waste)
+        self.assertTrue(waste[-1] == sample_card,
+                msg="Non-Empty stock should move a card to the top of the tableau.")
+
 
 
 
