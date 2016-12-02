@@ -121,7 +121,7 @@ Are you sure your project is using cards1.py?')
         fnd, tab, stock, waste = proj10.setup_game()
 
         # stock
-        self.assertListEqual(stock, self._stock,
+        self.assertEqual(stock, self._stock,
                 msg='Stock was not setup in the correct manner.\nSize = {}.\nCheck the project PDF.\
 Are you sure your project is using cards1.py?'.format(len(stock)))
 
@@ -523,29 +523,6 @@ than the rank of what is on the top of the fnd is an error."):
 
         self.assertTrue(test_tab_col_dest[-1] == test_src_card,
                 msg="tab_to_fnd should succed if tab[-1] is 1 rank higher than dest and suits are diff")
-
-# waste_to_tableau face test
-
-    def testWasteToTableauFaceDown(self):
-        """
-        waste_to_tableau(waste : list, tab_col : list, stock : Deck)
-        Returns:
-            None
-
-        Good suit, good rank.
-        """
-        with self.assertRaises(RuntimeError, msg="Face down source card should cause an error."):
-            # test source waste
-            test_waste_src = [cards.Card(rank=1, suit=2)]
-            if test_waste_src[-1].is_face_up():
-                test_waste_src[-1].flip_card()
-
-            # test destination foundation with an ace on top
-            test_tab_col_dest = [cards.Card(rank=2, suit=1)]
-            try:
-                proj10.waste_to_tableau(test_waste_src, test_tab_col_dest)
-            except TypeError as e:
-                proj10.waste_to_tableau(test_waste_src, test_tab_col_dest, [])
 
     def testWasteToTableauFaceUp(self):
         """
