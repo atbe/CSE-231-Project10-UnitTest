@@ -189,8 +189,6 @@ Are you sure your project is using cards1.py?'.format(len(waste)))
         # test face down
         self.assertFalse(proj10.valid_fnd_move(self._face_down_card, self._heart_two_card),
                 msg="A face down src_card is not a valid move.")
-        self.assertFalse(proj10.valid_fnd_move(self._heart_two_card, self._face_down_card),
-                msg="A face down dest_card is not a valid move.")
 
         # test diff suits
         self.assertFalse(proj10.valid_fnd_move(self._heart_three_card, self._club_two_card),
