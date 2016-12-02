@@ -1,3 +1,9 @@
+import os, sys
+lib_path = os.path.abspath(os.path.join('..'))
+# cur_dir_path = os.path.abspath(os.path.join('.'))
+sys.path.append(lib_path)
+# sys.path.append(cur_dir_path)
+
 import unittest
 import proj10
 import cards1
@@ -68,7 +74,7 @@ class TestProj10(unittest.TestCase):
 
         self._enbody_game_elements_dict = {} # temp
         try:
-            with open('enbody_game_elements.pckl', 'rb') as infile:
+            with open('./enbody_game_elements.pckl', 'rb') as infile:
                 enbody_game_elements_dict = pickle.load(infile)
                 self._fnd = enbody_game_elements_dict['fnd']
                 self._tab = enbody_game_elements_dict['tab']
@@ -795,4 +801,3 @@ rank be no more than 1 less than the dest_card."):
 
 if __name__ == '__main__':
     unittest.main()
-
